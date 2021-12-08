@@ -1,83 +1,118 @@
-let addBtn = document.querySelectorAll(".btn-danger");
+let addbutton = document.querySelectorAll(".btn-danger");
 
-//Functions
+creatStorage();
 
+productCount();
 
-if (!localStorage.getItem("basket")) {
-    localStorage.setItem("basket", JSON.stringify([]))
-    createItemsinBasket()
-}
-let basket = JSON.parse(localStorage.getItem("basket"));
-document.querySelector('sup').innerText = basket.length;
-addBtn.forEach((btn) => {
-    btn.addEventListener("click", function(e) {
+addbutton.forEach((button) => {
+  button.addEventListener("click", function (e) {
+    e.preventDefault();
 
-        let Id = this.parentElement.parentElement.getAttribute('data-id');
-        let price = this.previousElementSibling.innerText;
-        let title = this.parentElement.firstElementChild.innerText
-        let image = this.parentElement.previousElementSibling.src
-
-
-        let exict = basket.find(item => item.id == Id)
-
-        if (exict == undefined) {
-            basket.push({
-                id: Id,
-                Price: price,
-                Title: title,
-                image: image,
-                count: 1
-            })
-        } else {
-            exict.count++;
-        }
-
-        localStorage.setItem("basket", JSON.stringify(basket));
-        document.querySelector('sup').innerText = basket.length;
-
-
-    });
+    let id = this.parentElement.parentElement.getAttribute("data-id");
+    let price = this.previousElementSibling.innerText;
+    let title = this.parentElement.firstElementChild.innerText;
+    let image = this.parentElement.previousElementSibling.src;
+    creatStorage();
+    let basket = addbasket(id, price, title, image);
+    localStorage.setItem("basket", JSON.stringify(basket));
+    productCount();
+  });
 });
 
-let cartitems = document.querySelector('.row')
-const goCard = document.querySelector(".fa-shopping-basket")
-    // Inside of Basket
+function addbasket(Id, Price, Title, Image) {
+  let basket = JSON.parse(localStorage.getItem("basket"));
+  let exist = basket.find((item) => item.id == Id);
 
-function createItemsinBasket() {
-    let tbody = document.querySelector("tbody")
-    console.log(tbody);
-    let basket = JSON.parse(localStorage.getItem("basket"));
-    console.log(basket);
-    basket.forEach(item => {
-        let newtd1 = document.createElement('td');
-        let td1img = document.createElement('img')
-        newtd1.appendChild(td1img);
-        td1img.setAttribute('src', item.image);
-        let newtd2 = document.createElement('td');
-        newtd2.innerHTML = item.title;
-        let newtd3 = document.createElement('td')
-        newtd3.innerHTML = item.price;
-        let newtd4 = document.createElement('td');
-        newtd4.innerHTML = item.count;
-        let newtd5 = document.createElement("td")
-        let td5btn = document.createElement("button")
-        td5btn.setAttribute("class", "btn btn-danger")
-        td5btn.setAttribute("onclick", "deleterow()")
-        td5btn.innerHTML = "Delete";
-        newtd5.appendChild(td6btn);
-        let newtr = document.createElement("tr");
-        newtr.appendChild(newtd1);
-        newtr.appendChild(newtd2);
-        newtr.appendChild(newtd3);
-        newtr.appendChild(newtd4);
-        newtr.appendChild(newtd5)
-        tbody.appendChild(newtr);
-    })
+  if (exist == undefined) {
+    basket.push({
+      id: Id,
+      price: Price,
+      title: Title,
+      image: Image,
+      count: 1,
+    });
+  } else {
+    exist.count++;
+  }
+  return basket;
 }
-createItemsinBasket();
 
-function deleteItemsinBasket() {
-    let table = document.querySelector(".table")
-    console.log(this.parentElement)
-    table.remove(this.parentElement)
+showProducts();
+
+function productCount() {
+  document.querySelector("sup").innerText = JSON.parse(
+    localStorage.getItem("basket")
+  ).length;
+}
+
+function creatStorage() {
+  if (!localStorage.getItem("basket")) {
+    localStorage.setItem("basket", JSON.stringify([]));
+  }
+}
+
+// Basket
+
+function showProducts() {
+  let basketlength = +JSON.parse(localStorage.getItem("basket")).length;
+  let basket = JSON.parse(localStorage.getItem("basket"));
+  let listofproduct = 1;
+  for (let i = 0; i < basketlength; i++) {
+    let tr = document.createElement("tr");
+    let td = document.createElement("td");
+    let td2 = document.createElement("td");
+    let td3 = document.createElement("td");
+    let td4 = document.createElement("td");
+    let td5 = document.createElement("td");
+    let span = document.createElement("span");
+    let span2 = document.createElement("span");
+    let span3 = document.createElement("span");
+    let th = document.createElement("th");
+    let img = document.createElement("img");
+
+    th.setAttribute("scope", "row");
+    let tbody = document.querySelector("#body");
+
+    th.innerText = listofproduct;
+    listofproduct++;
+    td3.innerText = basket[i].price;
+    td2.innerText = basket[i].title;
+    td4.innerText = basket[i].count;
+    let src = basket[i].image;
+    img.setAttribute("src", src);
+    td.style.width = "15rem";
+    img.style.width = "30%";
+    span.innerText = "X";
+    span.style.cursor = "pointer";
+    span.classList.add("close");
+
+    td5.appendChild(span);
+    td.appendChild(img);
+    tr.appendChild(th);
+    tr.appendChild(td);
+    tr.appendChild(td2);
+    tr.appendChild(td3);
+    tr.appendChild(td4);
+    tr.appendChild(td5);
+    tbody.append(tr);
+  }
+
+  let span = document.querySelectorAll(".close");
+  let spanarr = Array.from(span);
+  console.log(spanarr);
+
+  for (let i = 0; i < spanarr.length; i++) {
+    spanarr[i].addEventListener('click',function(e){
+      let btn = e.target;
+      let index = spanarr.indexOf(btn)
+      let tr = btn.parentElement.parentElement;
+      basket.splice(index, 1);
+      localStorage.setItem("basket", JSON.stringify(basket));
+      document.querySelector("sup").innerText = JSON.parse(
+        localStorage.getItem("basket")
+      ).length;
+      spanarr.splice(index,1)
+      tr.remove(); 
+    })
+  }
 }
