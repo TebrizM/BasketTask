@@ -37,8 +37,8 @@ function addbasket(Id, Price, Title, Image) {
   return basket;
 }
 
-showProducts();
-
+itemsInBasket();
+editCount();
 function productCount() {
   document.querySelector("sup").innerText = JSON.parse(
     localStorage.getItem("basket")
@@ -53,7 +53,7 @@ function creatStorage() {
 
 // Basket
 
-function showProducts() {
+function itemsInBasket() {
   let basketlength = +JSON.parse(localStorage.getItem("basket")).length;
   let basket = JSON.parse(localStorage.getItem("basket"));
   let listofproduct = 1;
@@ -65,7 +65,7 @@ function showProducts() {
     let td4 = document.createElement("td");
     let td5 = document.createElement("td");
     let span = document.createElement("span");
-    let span2 = document.createElement("span");
+    let span2 = document.createElement("span",'Minus');
     let span3 = document.createElement("span");
     let th = document.createElement("th");
     let img = document.createElement("img");
@@ -85,7 +85,18 @@ function showProducts() {
     span.innerText = "X";
     span.style.cursor = "pointer";
     span.classList.add("close");
+    span2.innerText = "<";
+    span2.style.cursor = "pointer";
+    span2.style.position = "relative"
+    span2.style.right = "10%";
+    span3.innerText = ">";
+    span3.style.cursor = "pointer";
+    span3.style.cursor = "pointer";
+    span3.style.position = "relative"
+    span3.style.right = "-1%";
 
+    td4.appendChild(span2);
+    td4.appendChild(span3);
     td5.appendChild(span);
     td.appendChild(img);
     tr.appendChild(th);
@@ -115,4 +126,27 @@ function showProducts() {
       tr.remove(); 
     })
   }
+  
+ 
+}
+function editCount(e){
+  const isPlusButton = e.target.classList.contains('span2');
+  const isMinusButton = e.target.classList.contains('span3');
+    if (isPlusButton || isMinusButton) {
+        for (let i = 0; i < basket.length; i++) {
+            if (basket[i].id == e.target.dataset.id) {
+                if (isPlusButton) {
+                    basket[i].count += 1
+                } else if (isMinusButton) {
+                    basket[i].count -= 1
+                }
+
+
+            }
+            if (basket[i].count <= 0) {
+                basket.splice(i, 1);
+            }
+        }
+
+    }
 }
